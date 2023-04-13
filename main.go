@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/reujab/wallpaper"
@@ -10,6 +11,13 @@ import (
 
 func main() {
 	go func() {
+		// Get the absolute path to the "wallpapers" directory
+		dir, err := filepath.Abs("./wallpapers")
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
 		for {
 			// Get the current date and time
 			now := time.Now()
@@ -35,18 +43,26 @@ func main() {
 				os.Exit(1)
 			}
 
+			// Get the absolute path to the wallpaper file
+			filepath := filepath.Join(dir, filename)
+
 			// Set the desktop wallpaper
-			err := wallpaper.SetFromFile(filename)
+			err := wallpaper.SetFromFile(filepath)
 			if err != nil {
 				fmt.Println("Error: Could not set desktop wallpaper.")
 				os.Exit(1)
 			}
+			err = wallpaper.SetMode(wallpaper.Crop)
+			if err != nil {
+				fmt.Println("Error: Could not set desktop wallpaper mode.")
+				os.Exit(1)
+			}
 
 			// Print a success message
-			fmt.Printf("Desktop wallpaper set to %s\n", filename)
+			fmt.Printf("Desktop wallpaper set to %s\n", filepath)
 
-			// Sleep for 24 hours before changing the wallpaper again
-			time.Sleep(24 * time.Hour)
+			// Sleep for 12 hours before changing the wallpaper again
+			time.Sleep(12 * time.Hour)
 		}
 	}()
 
